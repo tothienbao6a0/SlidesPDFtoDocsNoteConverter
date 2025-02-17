@@ -1,0 +1,59 @@
+/**
+ * Converts PDF to images and creates a Google Doc with a table for notes,
+ * constraining image width to half the page and preserving aspect ratio.
+ */
+function convertPDFToImagesAndCreateDoc() {
+  const pdfFileId = 'YOUR_ID'; // Replace with your PDF ID
+  const maxImageWidth = 300; // Maximum image width (half page width is about 300-350)
+  const slideAspectRatio = 16 / 9; // Typical slide aspect ratio (widescreen)
+
+  try {
+    const pdfFile = DriveApp.getFileById(pdfFileId);
+    const pdfBlob = pdfFile.getBlob();
+
+    PDFApp.setPDFBlob(pdfBlob)
+      .convertPDFToPng()
+      .then(function(imageBlobs) {
+        if (!imageBlobs || imageBlobs.length === 0) {
+          Browser.msgBox('No images were generated from the PDF.');
+          return;
+        }
+
+        const doc = DocumentApp.create('Lecture Notes - ' + pdfFile.getName());
+        const body = doc.getBody();
+        const table = body.appendTable();
+
+        imageBlobs.forEach(function(imageBlob, index) {
+          const row = table.appendTableRow();
+          const imageCell = row.appendTableCell();
+          const noteCell = row.appendTableCell();
+
+          // Calculate height based on max width and assumed aspect ratio
+          let newWidth = maxImageWidth;
+          let newHeight = newWidth / slideAspectRatio; // Maintain 16:9 ratio
+
+          // Insert image with calculated dimensions
+          const insertedImage = imageCell.insertImage(0, imageBlob);
+          insertedImage.setWidth(newWidth);
+          insertedImage.setHeight(newHeight);
+
+          // Add placeholder text for notes
+          noteCell.setText('Notes for Slide ' + (index + 1) + '\n\n');
+        });
+
+        doc.saveAndClose();
+        const docUrl = doc.getUrl();
+        Logger.log('Document created: ' + docUrl);
+        Browser.msgBox('Document created! Open it here:\n\n' + docUrl);
+      })
+      .catch(function(err) {
+        Logger.log('Error: ' + err);
+        Browser.msgBox('An error occurred: ' + err);
+      });
+
+  } catch (e) {
+    Logger.log('General error: ' + e.toString());
+        Browser.msgBox('A general error occurred: ' + e.toString());
+  }
+}
+
