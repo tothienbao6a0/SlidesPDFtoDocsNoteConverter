@@ -37,7 +37,7 @@ This project automates the process of extracting lecture slides from a PDF file 
     *   Select the latest version of the library.
     *   Click "Save".
   
-4.  **Copy the Script Code:**  Copy the complete script code (provided below) into the Google Apps Script editor.
+4.  **Copy the Script Code:**  Copy the complete script code (provided in the file) into the Google Apps Script editor.
 
 5.  **Replace the Placeholder:**  In the script, replace `"YOUR_PDF_FILE_ID_HERE"` with the actual ID of your PDF file in Google Drive.  See "Finding the PDF File ID" below for instructions.
 
